@@ -70,7 +70,7 @@ def error_func(coeff, spacing, source):
 	return error
 
 args = (spacing, source)
-output = scipy.optimize.fmin(error_func, numpy.array([1.0,1.0]), args)
+output = scipy.optimize.fmin_powell(error_func, numpy.array([0.0,0.0]), args)
 print output
 
 plot.show()
