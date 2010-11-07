@@ -2,6 +2,7 @@
 #!/usr/bin/python
 import numpy
 import matplotlib.pyplot as plot
+import scipy.optimize
 
 def read_file(f):
 	file = open(f, 'r')
@@ -48,7 +49,6 @@ def plot_complex(freq, data):
 	plot.show()
 
 
-
 base_dir = 'ABS_Pod23_241010/rs.04/'
 
 s = read_file(base_dir + 'const_complex_na_0_0.38_0.250/complex.dat')
@@ -57,7 +57,23 @@ m = read_file(base_dir + 'const_complex_na_2_0.38_0.240/complex.dat')
 
 out = transfer_func(s, n, m)
 
-plot_complex(s[0], out)
-	
+#plot_complex(s[0], out)
+
+spacing = numpy.linspace(0,10, 100)
+source = 5*numpy.sin(spacing)
+plot.plot(spacing, source)
+
+def error_func(coeff, spacing, source):
+	predict = coeff[0] * numpy.sin(coeff[1]*spacing)
+	error = numpy.sum(numpy.power(predict - source, 2))
+	print error
+	return error
+
+args = (spacing, source)
+output = scipy.optimize.fmin(error_func, numpy.array([1.0,1.0]), args)
+print output
+
+plot.show()
+
 
 
