@@ -59,20 +59,36 @@ out = transfer_func(s, n, m)
 
 #plot_complex(s[0], out)
 
-spacing = numpy.linspace(0,10, 100)
-source = 5*numpy.sin(spacing)
-plot.plot(spacing, source)
+def predict_func(coeff, spacing):
+	r0 = coeff[0]
+	b_i = coeff[1]
+	l_i = coeff[2]
+	t_i = coeff[3]
+
+	i = (0+1j)
+	predict = r0*(1+b_i) + (r0*l_i)/(1-l_i)*(2+b_i)/(1+i*t_i*spacing)
+	return predict
 
 def error_func(coeff, spacing, source):
-	predict = coeff[0] * numpy.sin(coeff[1]*spacing)
-	error = numpy.sum(numpy.power(predict - source, 2))
-	print error
+	predict = predict_func(coeff, spacing)
+	error = numpy.sum(numpy.power(numpy.abs(predict - source), 2))
 	return error
 
-args = (spacing, source)
-output = scipy.optimize.fmin_powell(error_func, numpy.array([0.0,0.0]), args)
-print output
+args = (s[0], out)
+coeff = scipy.optimize.fmin_powell(error_func, numpy.array([10.0,0.0,0.0,0.0]), args)
+print "Coeffecients: ", coeff
+print "Error: ", error_func(coeff, s[0], out)
+predict = predict_func(coeff, s[0])
 
+a = plot.subplot(311)
+a.plot(numpy.log10(s[0]), numpy.real(out), 'o')
+a.plot(numpy.log10(s[0]), numpy.real(predict), 'o')
+a = plot.subplot(312)
+a.plot(numpy.log10(s[0]), numpy.imag(out), 'o')
+a.plot(numpy.log10(s[0]), numpy.imag(predict), 'o')
+a = plot.subplot(313)
+a.plot(numpy.real(out), numpy.imag(out), 'o')
+a.plot(numpy.real(predict), numpy.imag(predict), 'o')
 plot.show()
 
 
