@@ -1,0 +1,7 @@
+SA values pre & post freq 100000 Hz Num 1:  0.29606  0.301385
+SA values pre & post freq 10000 Hz Num 1:  0.295907  0.300515
+SA values pre & post freq 1000 Hz Num 1:  0.296167  0.298074
+SA values pre & post freq 100 Hz Num 1:  0.29429  0.59057
+SA values pre & post freq 100 Hz Num 2:  0.299157  0.443689
+SA values pre & post freq 100 Hz Num 3:  0.298791  0.443612
+SA failed to stabilize during 3 attempts for freq 100 Hz. Continuing acquisition.

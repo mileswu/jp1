@@ -1,0 +1,9 @@
+# This pixel.
+rs               27
+ 
+# Optimal bias points.
+sab_best         3.
+safb_best        -2.2
+s2b_best         4.99
+s2fb_best        0.0
+s1b_best         4.49

@@ -1,0 +1,24 @@
+rs	offset_vphi	johnson
+01	ok		no (pulled bonds)
+02	ok		ok
+03	ok		ok  (no iv?)
+04	ok		ok
+05	ok		normal
+06	ok		normal
+07	ok		ok
+08	ok		ok
+09	ok		ok
+10	ok		no johnson(new open)
+11	ok		no johnson
+12	ok		ok
+13	ok		ok
+14	ok		no johnson
+15	ok		ok
+16	ok		ok
+17	ok		no 
+18	ok		no 
+19	ok		always sc
+20	ok		no 
+21	no vphi		no 
+22	ok		no 
+23	ok		always sc				
