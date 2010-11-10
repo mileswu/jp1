@@ -8,10 +8,16 @@ def read_file(f):
 	file = open(f, 'r')
 
 	length = -1
-	while file.readline():
-		length += 1
+	file.readline()
+	while 1:
+		line = file.readline()
+		if line == '':
+			break
+		split_line = line.split()
+		if(float(split_line[0]) < 4000):
+			length += 1
 
-	#length = 531
+	#length = 650
 
 	freq = numpy.zeros(length)
 	com = numpy.zeros(length, complex)
@@ -48,17 +54,6 @@ def plot_complex(freq, data):
 
 	plot.show()
 
-
-base_dir = 'ABS_Pod23_241010/rs.04/'
-
-s = read_file(base_dir + 'const_complex_na_0_0.38_0.250/complex.dat')
-n = read_file(base_dir + 'const_complex_na_0_0.60_0.250/complex.dat')
-m = read_file(base_dir + 'const_complex_na_2_0.38_0.240/complex.dat')
-
-out = transfer_func(s, n, m)
-
-#plot_complex(s[0], out)
-
 def predict_func(coeff, spacing):
 	r0 = coeff[0]
 	b_i = coeff[1]
@@ -74,22 +69,35 @@ def error_func(coeff, spacing, source):
 	error = numpy.sum(numpy.power(numpy.abs(predict - source), 2))
 	return error
 
-args = (s[0], out)
-coeff = scipy.optimize.fmin_powell(error_func, numpy.array([10.0,0.0,0.0,0.0]), args)
-print "Coeffecients: ", coeff
-print "Error: ", error_func(coeff, s[0], out)
-predict = predict_func(coeff, s[0])
+def fit_nist(s, out):
+	args = (s[0], out)
+	coeff = scipy.optimize.fmin_powell(error_func, numpy.array([8.0,0.0,0.0,0.0]), args)
+	print "Coeffecients: ", coeff
+	print "Error: ", error_func(coeff, s[0], out)
+	predict = predict_func(coeff, s[0])
 
-a = plot.subplot(311)
-a.plot(numpy.log10(s[0]), numpy.real(out), 'o')
-a.plot(numpy.log10(s[0]), numpy.real(predict), 'o')
-a = plot.subplot(312)
-a.plot(numpy.log10(s[0]), numpy.imag(out), 'o')
-a.plot(numpy.log10(s[0]), numpy.imag(predict), 'o')
-a = plot.subplot(313)
-a.plot(numpy.real(out), numpy.imag(out), 'o')
-a.plot(numpy.real(predict), numpy.imag(predict), 'o')
-plot.show()
+	a = plot.subplot(311)
+	a.plot(numpy.log10(s[0]), numpy.real(out), 'o')
+	a.plot(numpy.log10(s[0]), numpy.real(predict), 'o')
+	a = plot.subplot(312)
+	a.plot(numpy.log10(s[0]), numpy.imag(out), 'o')
+	a.plot(numpy.log10(s[0]), numpy.imag(predict), 'o')
+	a = plot.subplot(313)
+	a.plot(numpy.real(out), numpy.imag(out), 'o')
+	a.plot(numpy.real(predict), numpy.imag(predict), 'o')
+	plot.show()
 
+
+
+base_dir = 'ABS_Pod23_241010/rs.04/'
+
+s = read_file(base_dir + 'const_complex_na_0_0.38_0.250/complex.dat')
+n = read_file(base_dir + 'const_complex_na_0_0.60_0.250/complex.dat')
+m = read_file(base_dir + 'const_complex_na_2_0.38_0.240/complex.dat')
+
+out = transfer_func(s, n, m)
+
+#plot_complex(s[0], out)
+fit_nist(s, out)
 
 
