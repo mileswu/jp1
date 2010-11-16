@@ -1,0 +1,31 @@
+\documentclass[letterpaper,10pt]{article}
+\special{papersize=8.5in,11in}
+\setlength{\pdfpageheight}{\paperheight}
+\setlength{\pdfpagewidth}{\paperwidth}
+
+\begin{document}
+\title{TES Bolometers: An Outline }
+\author{Miles Wu (advisor: Prof. Staggs)}
+\maketitle
+
+\begin{abstract}
+A brief overview and outline for the JP.
+\end{abstract}
+
+\section{Introduction}
+Superconducting Transition-Edge Sensors (TES) are a type of bolometer that exploit the superconducting-to-normal transition in order to achieve very high levels of sensitivity. Modeling their electro-thermal behaviour and matching it to experimental measurements allows determination of many important coeffecients of TES operation. In the JP, I shall explore various models and see how well they match to the measurements.
+
+\section{Outline}
+\begin{description}
+\item[Brief Introduction] (\emph{a paragraph}) This will describe briefly how a TES works (i.e. the high change in resistance due to temperature in the superconducting band) and what its applications are for (eg. measuring CMB at ACT). Perhaps there might be a diagram showing how the TES, bias circuit, heat bath and SQUID are all connected.
+\item[Basic Model] (\emph{5 pages}) This will describe and derive the simple model of the TES, as set out in the NIST paper, leading to the complex impedence equations. This will then be plotted to show the shape of the function (a semi-circle).
+\item[Fitting] (\emph{2 pages}) This will explain how the complex impedence equation is fitted to the model, using a computer program and a optimization algorithm. The data will then be fitted to the model and the coeffecients listed. Both the model and the actual data will be plotted on the same graph to see if the shape is right, in order to examine how accurate the model is.
+\item[Expanding the Model] (\emph{5 pages}) The basic model will be expanded and adapated. Here the physical significance of the changes to the basic model will be discussed, and the equations rederived.
+\item[Results] (\emph{2 pages}) The equation from the previous section is then fitted again to the data, and the coeffecients listed. Again graphs will be ploted to check the accuracy. It will also discuss whether the coeffecient values seem reliastic or make physical sense.
+\item[Error] (\emph{1 page}) Examine the error and confidence values for the previous section's results.
+\item[Noise] Maybe if there is time, I might look into predicting the noise.
+\item[Conclusion] (\emph{a paragraph or two}) Perhaps I'll suggest some additional model adaptations that could be done in the future to improve accuracy. 
+\item[Appendix] Source code to the computer program.
+\end{description}
+
+\end{document}
