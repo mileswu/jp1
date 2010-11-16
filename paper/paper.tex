@@ -1,0 +1,117 @@
+\documentclass[letterpaper,10pt]{article}
+\special{papersize=8.5in,11in}
+\setlength{\pdfpageheight}{\paperheight}
+\setlength{\pdfpagewidth}{\paperwidth}
+\usepackage{fullpage}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\begin{document}
+\title{TES Bolometers}
+\author{Miles Wu (advisor: Prof. Staggs)}
+\maketitle
+
+\begin{abstract}
+Abstract.
+\end{abstract}
+
+\section{Introduction}
+
+Talk about how ours are voltaged biased.
+
+\section{Basic Model}
+Here we follow the Irwin and Hilton derivation of the TES Complex Impedence for the basic model [ref]. Some definitions of variables that are used later on are given here:
+
+The logarithmic temperature sensitvity of the TES resistance: \begin{eqnarray}\alpha \equiv \left.\frac{\partial \log R}{\partial \log T}\right|_{I_0}\end{eqnarray}
+The logarithmic current sensitvity of the TES resistance:
+\begin{eqnarray}
+	\alpha \equiv \left.\frac{\partial \log R}{\partial \log I}\right|_{T_0} \label{log1}
+\end{eqnarray}
+The low-frequency loop gain under constant current:
+\begin{eqnarray}
+	\mathcal{L} \equiv \frac{P_{J_0} \alpha}{G T_0} \label{log2}
+\end{eqnarray}
+
+\subsection{Electrical Differential Equation}
+Electrically the TES circuit consists of a bias current and a shunt resistor, $R_{shunt}$ in parallel with the TES. The TES itself has both a complex impedence as well as an inductance. Additionally, there is stray inductance and resistance in the wires. These are repesented by having an inductor with inductance $L = L_{TES} + L_{stray}$ and a resistor with resistance $R_{stray}$. This is shown in Figure X.
+
+(EXPLAIN MORE)This circuit has a Thevenin-equiavlent where the voltage is $V = I_{bias} R_{shunt}$ and the resistance is $R_{th} = R_{shunt} + R_{stray}$.
+
+From Kirchhoff's second law, adding up the potential differences around this closed circuit needs to sum to zero, leading to the following differential equation:
+\begin{eqnarray}
+	V - I R_{th} - L \frac{\operatorname{d} I}{\operatorname{d} t} - I R_{TES} &=& 0 \label{electrical-diffeq}
+\end{eqnarray}
+
+$R_{TES}$ in general is a function of both temperature and current. For small signals the first order Taylor expansion around $T_0$ and $I_0$ is:
+\begin{eqnarray}
+	R_{TES} &=& R_0 + \left.\frac{\partial R}{\partial T}\right|_{I_0} \: \delta T + \left.\frac{\partial R}{\partial I}\right|_{T_0} \: \delta I \\
+	&=& R_0 + \frac{R_0}{T_0}\left.\frac{\partial \log R}{\partial \log T}\right|_{I_0} \: \delta T + \frac{R_0}{I_0}\left.\frac{\partial \log R}{\partial \log I}\right|_{T_0} \: \delta I \\
+	\mbox{(substituting in \eqref{log1}, \eqref{log2})}&=& R_0 + \frac{R_0}{T_0}\alpha \: \delta T + \frac{R_0}{I_0}\beta \: \delta I \label{r-expanded}
+\end{eqnarray}
+
+We can subtitute \eqref{r-expanded} into \eqref{electrical-diffeq}:
+\begin{eqnarray}
+	V - I R_{th} - L \frac{\operatorname{d} I}{\operatorname{d} t} - I \left(R_0 + \frac{R_0}{T_0}\alpha \: \delta T + \frac{R_0}{I_0}\beta \: \delta I\right) &=& 0
+\end{eqnarray}
+Rewriting the current as $I = I_0 + \delta I$, and the voltage as $V = V_{bias} + \delta V$:
+\begin{eqnarray}
+	V_{bias} + \delta V - L \frac{\operatorname{d} \delta I}{\operatorname{d} t} - ( R_{th} + R_0 ) I_0 - \left(R_th + R_0 + R_0 \beta \right) \delta I - \frac{R_0 I_0}{T_0}\alpha \: \delta T - \frac{R_0}{I_0}\beta  {\delta I}^2 - \frac{R_0}{T_0}\alpha {\delta T}{\delta I} = 0
+\end{eqnarray}
+
+Since we are dealing with small signals, we can drop the second order terms (${\delta I}^2$ and ${\delta T}{\delta I}$). Additionally the steady-state variables cancel. In other words:
+\begin{eqnarray}
+	V_{bias} - ( R_{th} + R_0 ) I_0 &=& 0
+\end{eqnarray}
+Therefore we are left with:
+\begin{eqnarray}
+	\delta V - L \frac{\operatorname{d} \delta I}{\operatorname{d} t} - \left(R_th + R_0 + R_0 \beta \right) \delta I - \frac{R_0 I_0}{T_0}\alpha \: \delta T &=& 0 \\
+	\frac{\operatorname{d} \delta I}{\operatorname{d}t} + \frac{\left(R_th + R_0 ( 1 + \beta ) \right)}{L} \delta I - \frac{P_{J_0}}{L I_0 T_0}\alpha \: \delta T + \frac{\delta V}{L}&=& 0 \\
+	\frac{\operatorname{d} \delta I}{\operatorname{d}t} + \frac{\left(R_th + R_0 ( 1 + \beta ) \right)}{L} \delta I - \frac{\mathcal{L} G}{I_0 L}\alpha \: \delta T + \frac{\delta V}{L}&=& 0
+\end{eqnarray}
+
+\subsection{Thermal Differential Equation}
+Thermally, in the simple model, the TES, with specific heat capacity $C$, is connected to a heat bath via a thermal link with thermal conductivity $G$. The TES is heated up by Joule heating, $P_{joule}$ as well as the signal, $P$, but cooled by the heat bath $P_{bath}$. Just from adding up the heat flow we obtain:
+\begin{eqnarray}
+	C \frac{\operatorname{d}T}{\operatorname{d}t} &=& P_{joule} + P - P_{bath} \label{thermal-diffeq}
+\end{eqnarray}
+Expanding $P_{bath}$ to first order:
+\begin{eqnarray}
+	P_{bath} &=& P_{bath_0} + \frac{\operatorname{d} P_{bath}}{\operatorname{d} T} \delta T
+\end{eqnarray}
+However, the thermal conductivity $G$ is defined by $G = \frac{\operatorname{d} P_{bath}}{\operatorname{d} T}$, leaving:
+\begin{eqnarray}
+	P_{bath} &=& P_{bath_0} + G\delta T \label{p-bath}
+\end{eqnarray}
+The Joule power is:
+\begin{eqnarray}
+	P_{joule} &=& I^2 R
+\end{eqnarray}
+Expanding the current squared around $I_0$ as $I^2 = I_0^2 + 2 \delta I$, and using \eqref{r-expanded}:
+\begin{eqnarray}
+	P_{joule} &=& (I_0^2 + 2 I_0 \delta I)\left(R_0 + \frac{R_0}{T_0}\alpha \: \delta T + \frac{R_0}{I_0}\beta \: \delta I\right) \\
+	&=& I_0^2 R_0 + \left(2 I_0 R_0 + I_0 R_0\beta\right) \delta I + \frac{I_0^2 R_0}{T_0}\alpha \: \delta T + \frac{2 I_0 R_0}{T_0}\alpha \: \delta T \delta I + 2R_0 \beta \: {\delta I}^2 \\
+	\mbox{\em{(dropping second-order terms)}} &=& P_{J_0} + I_0 R_0 (2 + \beta) \delta I + \frac{P_{J_0}}{T_0}\alpha \: \delta T \label{p-joule}
+\end{eqnarray}
+Putting \eqref{p-bath} and \eqref{p-joule} into \eqref{thermal-diffeq}, we obtain:
+\begin{eqnarray}
+	C \frac{\operatorname{d}T}{\operatorname{d}t} &=& P_{J_0} + I_0 R_0 (2 + \beta) \delta I + \frac{P_{J_0}}{T_0}\alpha \: \delta T + P - P_{bath_0} - G\delta T 
+\end{eqnarray}
+Rewriting the power as $P = P_0 + \delta P$, and the temperature as $T = T_0 + \delta T$:
+\begin{eqnarray}
+	C \frac{\operatorname{d} \delta T}{\operatorname{d}t} &=& P_{J_0} + I_0 R_0 (2 + \beta) \delta I + \frac{P_{J_0}}{T_0}\alpha \: \delta T + P_0 + \delta P - P_{bath_0} - G\delta T 
+\end{eqnarray}
+Once again the steady-state variables cancel. In other words:
+\begin{eqnarray}
+	P_{J_0} - P_{bath_0} + P_0 &=& 0
+\end{eqnarray}
+Therefore:
+\begin{eqnarray}
+	C \frac{\operatorname{d} \delta T}{\operatorname{d}t} - I_0 R_0 (2 + \beta) \delta I - \frac{P_{J_0}}{T_0}\alpha \: \delta T - \delta P + G\delta T &=& 0 \\
+	\frac{\operatorname{d} \delta T}{\operatorname{d}t} - \frac{I_0 R_0}{C} (2 + \beta) \delta I + \left(\frac{G - \frac{P_{J_0}}{T_0}\alpha}{C}\right) \delta T - \frac{\delta P}{C}  &=& 0 \\
+	\frac{\operatorname{d} \delta T}{\operatorname{d}t} - \frac{I_0 R_0}{C} (2 + \beta) \delta I + \frac{G}{C}(1 - \mathcal{L}) \delta T - \frac{\delta P}{C}  &=& 0 \\
+\end{eqnarray}
+
+\section{Fitting}
+
+
+\end{document}
