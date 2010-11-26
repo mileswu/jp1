@@ -14,7 +14,7 @@ def read_file(f):
 		if line == '':
 			break
 		split_line = line.split()
-		if(float(split_line[0]) < 4000):
+		if(float(split_line[0]) < 5000):
 			length += 1
 
 	#length = 650
@@ -54,6 +54,35 @@ def plot_complex(freq, data):
 
 	plot.show()
 
+def predict_func_matrix(coeff, spacing):
+	r_0 = coeff[0]
+	b_i = coeff[1]
+	l_i = coeff[2]
+	l = coeff[3]
+	g = coeff[4]
+	c = coeff[5]
+	l = coeff[6]
+	i_0 = coeff[7]
+	r_l = coeff[8]
+
+	t_i = c/(g*(1-l_i))
+	i = (0+1j)
+
+	predict = numpy.zeros(len(spacing), complex)
+	loop = 0
+
+	for w in spacing:
+		matrix = numpy.array([
+			[(r_l + r_0*(1 + b_i))/l + i*w, l_i*g/i_0/l],
+			[-i_0*r_0*(2+b_i)/c, 1/t_i + i*w]
+		])
+		inv = numpy.linalg.inv(matrix)
+		predict[loop] = l/inv[0][0] - r_l - i*w*l
+
+		loop += 1
+	
+	return predict
+
 def predict_func(coeff, spacing):
 	r0 = coeff[0]
 	b_i = coeff[1]
@@ -67,11 +96,12 @@ def predict_func(coeff, spacing):
 def error_func(coeff, spacing, source):
 	predict = predict_func(coeff, spacing)
 	error = numpy.sum(numpy.power(numpy.abs(predict - source), 2))
+	print(error)
 	return error
 
 def fit_nist(s, out):
 	args = (s[0], out)
-	coeff = scipy.optimize.fmin_powell(error_func, numpy.array([8.0,0.0,0.0,0.0]), args)
+	coeff = scipy.optimize.fmin_powell(error_func, numpy.array([8.0,0.0,0.0,0.0, 1.0, 1.0, 1.0, 1.0, 1.0]), args)
 	print "Coeffecients: ", coeff
 	print "Error: ", error_func(coeff, s[0], out)
 	predict = predict_func(coeff, s[0])
@@ -100,4 +130,9 @@ out = transfer_func(s, n, m)
 #plot_complex(s[0], out)
 fit_nist(s, out)
 
+#[  4.01595155e+00   2.22274144e+00   9.70883802e+01   2.42585040e+01
+#		   1.05966352e+00   9.99921211e-01  -9.52361404e-05   1.31204634e+01
+#			  -1.95673963e+00]
+#Coeffecients:  [  6.5081803    0.69093114 -47.79141748  32.2275852   -2.10748141
+#		   1.00464184   1.96451201  10.20215474   8.93260589]
 
