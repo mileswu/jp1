@@ -55,26 +55,44 @@ def plot_complex(freq, data):
 	plot.show()
 
 def predict_func_matrix(coeff, spacing):
+	for i in coeff:
+		if i < 0:
+			return 100000;
+	
+
 	r_0 = coeff[0]
 	b_i = coeff[1]
 	l_i = coeff[2]
-	l = coeff[3]
-	g = coeff[4]
-	c = coeff[5]
-	l = coeff[6]
-	i_0 = coeff[7]
-	r_l = coeff[8]
+	l = 1.0 #coeff[3]
+	
+	g = coeff[3]
+	c = coeff[4]
+	
+	i_0 =  1.0 #coeff[6]
+	r_l = 1.0 #coeff[7]
+	
+	g1 = coeff[5]
+	c1 = coeff[6]
 
 	t_i = c/(g*(1-l_i))
 	i = (0+1j)
 
 	predict = numpy.zeros(len(spacing), complex)
 	loop = 0
-
 	for w in spacing:
+		#matrix = numpy.array([
+		#	[(r_l + r_0*(1 + b_i))/l + i*w, l_i*g/i_0/l],
+		#	[-i_0*r_0*(2+b_i)/c, 1/t_i + i*w]
+		#])
+		#matrix = numpy.array([
+		#	[(r_l + r_0*(1 + b_i))/l + i*w, l_i*g/i_0/l, 0],
+		#	[-i_0*r_0*(2+b_i)/c, 1/t_i + i*w, g1/c1],
+		#	[0, -g1/c1, i*w]
+		#])
 		matrix = numpy.array([
-			[(r_l + r_0*(1 + b_i))/l + i*w, l_i*g/i_0/l],
-			[-i_0*r_0*(2+b_i)/c, 1/t_i + i*w]
+			[(r_l + r_0*(1 + b_i))/l + i*w, l_i*g/i_0/l, 0],
+			[-i_0*r_0*(2+b_i)/c, g/c -g*l_i/c + i*w, -g/c],
+			[0, -g/c1, g/c1 + g1/c1 + i*w]
 		])
 		inv = numpy.linalg.inv(matrix)
 		predict[loop] = l/inv[0][0] - r_l - i*w*l
@@ -94,17 +112,19 @@ def predict_func(coeff, spacing):
 	return predict
 
 def error_func(coeff, spacing, source):
-	predict = predict_func(coeff, spacing)
+	predict = predict_func_matrix(coeff, spacing)
 	error = numpy.sum(numpy.power(numpy.abs(predict - source), 2))
 	print(error)
 	return error
 
 def fit_nist(s, out):
 	args = (s[0], out)
-	coeff = scipy.optimize.fmin_powell(error_func, numpy.array([8.0,0.0,0.0,0.0, 1.0, 1.0, 1.0, 1.0, 1.0]), args)
+	coeff = scipy.optimize.fmin_powell(error_func, numpy.array([10.0, 1.0, 15.0, 1000.0, 41.0, 1.0, 1.0]), args)
+	#coeff = numpy.array([391.0, 0.9, 0.004, 878.0, 285.0])
+	#coeff = numpy.array([10.0, 0.9, 15.0, 3857.0, 45.0])
 	print "Coeffecients: ", coeff
 	print "Error: ", error_func(coeff, s[0], out)
-	predict = predict_func(coeff, s[0])
+	predict = predict_func_matrix(coeff, s[0])
 
 	a = plot.subplot(311)
 	a.plot(numpy.log10(s[0]), numpy.real(out), 'o')
@@ -130,9 +150,6 @@ out = transfer_func(s, n, m)
 #plot_complex(s[0], out)
 fit_nist(s, out)
 
-#[  4.01595155e+00   2.22274144e+00   9.70883802e+01   2.42585040e+01
-#		   1.05966352e+00   9.99921211e-01  -9.52361404e-05   1.31204634e+01
-#			  -1.95673963e+00]
-#Coeffecients:  [  6.5081803    0.69093114 -47.79141748  32.2275852   -2.10748141
-#		   1.00464184   1.96451201  10.20215474   8.93260589]
+#Coeffecients:  [  5.98340389e+00   6.23565491e-01   1.61887268e-01   1.52429108e+04
+  # 5.61840916e+00   1.75209612e+01   2.07340763e+01]
 
