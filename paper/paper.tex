@@ -31,6 +31,10 @@ The low-frequency loop gain under constant current:
 \begin{eqnarray}
 	\mathcal{L} \equiv \frac{P_{J_0} \alpha}{G T_0} \label{log2}
 \end{eqnarray}
+The thermal time constant:
+\begin{eqnarray}
+	\tau \equiv \frac{\frac{C}{G}}{1 - \mathcal{L}}
+\end{eqnarray}
 
 \subsection{Electrical Differential Equation}
 Electrically the TES circuit consists of a bias current and a shunt resistor, $R_{shunt}$ in parallel with the TES. The TES itself has both a complex impedence as well as an inductance. Additionally, there is stray inductance and resistance in the wires. These are repesented by having an inductor with inductance $L = L_{TES} + L_{stray}$ and a resistor with resistance $R_{stray}$. This is shown in Figure X.
@@ -64,9 +68,9 @@ Since we are dealing with small signals, we can drop the second order terms (${\
 \end{eqnarray}
 Therefore we are left with:
 \begin{eqnarray}
-	\delta V - L \frac{\operatorname{d} \delta I}{\operatorname{d} t} - \left(R_th + R_0 + R_0 \beta \right) \delta I - \frac{R_0 I_0}{T_0}\alpha \: \delta T &=& 0 \\
-	\frac{\operatorname{d} \delta I}{\operatorname{d}t} + \frac{\left(R_th + R_0 ( 1 + \beta ) \right)}{L} \delta I - \frac{P_{J_0}}{L I_0 T_0}\alpha \: \delta T + \frac{\delta V}{L}&=& 0 \\
-	\frac{\operatorname{d} \delta I}{\operatorname{d}t} + \frac{\left(R_th + R_0 ( 1 + \beta ) \right)}{L} \delta I - \frac{\mathcal{L} G}{I_0 L}\alpha \: \delta T + \frac{\delta V}{L}&=& 0
+	\delta V - L \frac{\operatorname{d} \delta I}{\operatorname{d} t} - \left(R_{th} + R_0 + R_0 \beta \right) \delta I - \frac{R_0 I_0}{T_0}\alpha \: \delta T &=& 0 \\
+	\frac{\operatorname{d} \delta I}{\operatorname{d}t} + \frac{\left(R_{th} + R_0 ( 1 + \beta ) \right)}{L} \delta I + \frac{P_{J_0}}{L I_0 T_0}\alpha \: \delta T - \frac{\delta V}{L}&=& 0 \\
+	\frac{\operatorname{d} \delta I}{\operatorname{d}t} + \frac{\left(R_{th} + R_0 ( 1 + \beta ) \right)}{L} \delta I + \frac{\mathcal{L} G}{I_0 L} \: \delta T - \frac{\delta V}{L}&=& 0 \label{electrical-diffeq-final}
 \end{eqnarray}
 
 \subsection{Thermal Differential Equation}
@@ -94,7 +98,7 @@ Expanding the current squared around $I_0$ as $I^2 = I_0^2 + 2 \delta I$, and us
 \end{eqnarray}
 Putting \eqref{p-bath} and \eqref{p-joule} into \eqref{thermal-diffeq}, we obtain:
 \begin{eqnarray}
-	C \frac{\operatorname{d}T}{\operatorname{d}t} &=& P_{J_0} + I_0 R_0 (2 + \beta) \delta I + \frac{P_{J_0}}{T_0}\alpha \: \delta T + P - P_{bath_0} - G\delta T 
+	C \frac{\operatorname{d}T}{\operatorname{d}t} &=& P_{J_0} + I_0 R_0 (2 + \beta) \delta I + \frac{P_{J_0}}{T_0}\alpha \: \delta T + P - P_{bath_0} - G\delta T
 \end{eqnarray}
 Rewriting the power as $P = P_0 + \delta P$, and the temperature as $T = T_0 + \delta T$:
 \begin{eqnarray}
@@ -108,10 +112,165 @@ Therefore:
 \begin{eqnarray}
 	C \frac{\operatorname{d} \delta T}{\operatorname{d}t} - I_0 R_0 (2 + \beta) \delta I - \frac{P_{J_0}}{T_0}\alpha \: \delta T - \delta P + G\delta T &=& 0 \\
 	\frac{\operatorname{d} \delta T}{\operatorname{d}t} - \frac{I_0 R_0}{C} (2 + \beta) \delta I + \left(\frac{G - \frac{P_{J_0}}{T_0}\alpha}{C}\right) \delta T - \frac{\delta P}{C}  &=& 0 \\
-	\frac{\operatorname{d} \delta T}{\operatorname{d}t} - \frac{I_0 R_0}{C} (2 + \beta) \delta I + \frac{G}{C}(1 - \mathcal{L}) \delta T - \frac{\delta P}{C}  &=& 0 \\
+	\frac{\operatorname{d} \delta T}{\operatorname{d}t} - \frac{I_0 R_0}{C} (2 + \beta) \delta I + \frac{G}{C}(1 - \mathcal{L}) \delta T - \frac{\delta P}{C}  &=& 0 \label{thermal-diffeq-final} \\
+	\frac{\operatorname{d} \delta T}{\operatorname{d}t} - \frac{I_0 R_0}{C} (2 + \beta) \delta I + \frac{1}{\tau} \delta T - \frac{\delta P}{C}  &=& 0 \label{thermal-diffeq-final}
+\end{eqnarray}
+
+\subsection{Matrix Form}
+We can represent both \eqref{electrical-diffeq-final} and \eqref{thermal-diffeq-final} in matrix form as:
+\begin{eqnarray}
+	\frac{\operatorname{d}}{\operatorname{d}t} 
+		\begin{pmatrix}
+			\delta I \\
+			\delta T			
+		\end{pmatrix}
+	+
+	\begin{pmatrix}
+		\frac{\left(R_{th} + R_0 ( 1 + \beta ) \right)}{L} & \frac{\mathcal{L} G}{I_0 L} \\
+		- \frac{I_0 R_0}{C} (2 + \beta) & \frac{1}{\tau}
+	\end{pmatrix}
+	\begin{pmatrix}
+		\delta I \\
+		\delta T
+	\end{pmatrix}
+	-
+	\begin{pmatrix}
+		\frac{\delta V}{L} \\
+		\frac{\delta P}{C}
+	\end{pmatrix}
+	&=& 0
+\end{eqnarray}
+SOMETHING AOBUT FOURRIER
+\begin{eqnarray}
+	\frac{\operatorname{d}}{\operatorname{d}t} 
+		\begin{pmatrix}
+			\delta I \\
+			\delta T			
+		\end{pmatrix}
+	&=&
+	\begin{pmatrix}
+			i \omega \delta I \\
+			i \omega \delta T			
+	\end{pmatrix}
+\end{eqnarray}
+Substituting this in:
+\begin{eqnarray}
+	\mathbf{M}
+	\begin{pmatrix}
+		\delta I \\
+		\delta T
+	\end{pmatrix}
+	=
+	\begin{pmatrix}
+		\frac{\left(R_{th} + R_0 ( 1 + \beta ) \right)}{L} + i\omega & \frac{\mathcal{L} G}{I_0 L} \\
+		- \frac{I_0 R_0}{C} (2 + \beta) & \frac{1}{\tau} + i\omega
+	\end{pmatrix}
+	\begin{pmatrix}
+		\delta I \\
+		\delta T
+	\end{pmatrix}
+	&=&
+	\begin{pmatrix}
+		\frac{\delta V}{L} \\
+		0
+	\end{pmatrix}
+\end{eqnarray}
+Since we wish to find complex impedence:
+\begin{eqnarray}
+	Z = \frac{V}{I} &=& \frac{V}{(\mathbf{M}^{-1})_{1,1} \frac{V}{L}} \\
+	&=& \frac{L \det \mathbf{M}}{\mathbf{M}_{2,2}} \\
+	&=& \frac{L \left(\left(\frac{R_{th} + R_0(1 + \beta)}{L} + i\omega\right) \left(\frac{1}{\tau} + i\omega\right) + \frac{\mathcal{L} G R_0}{C L} (2+\beta) \right) } {\frac{1}{\tau} + i\omega} \\
+	&=& R_{th} + R_0(1 + \beta) + i\omega L + \frac{\mathcal{L} G R_0}{C \left(\frac{1}{\tau} + i\omega\right)} (2 + \beta) \\
+	&=& R_{th} + R_0(1 + \beta) + i\omega L + \mathcal{L} R_0 \frac{G \tau}{C} \frac{2 + \beta}{1 + i\omega\tau} \\
+	&=& R_{th} + R_0(1 + \beta) + i\omega L + \frac{\mathcal{L} R_0}{1 - \mathcal{L}} \frac{2 + \beta}{1 + i\omega\tau}
+\end{eqnarray}
+
+From inspection it is clear that the complex impedence of just the TES is:
+\begin{eqnarray}
+	Z_{TES} &=& R_0(1 + \beta) + \frac{\mathcal{L} R_0}{1 - \mathcal{L}} \frac{2 + \beta}{1 + i\omega\tau} \label{ztes}
 \end{eqnarray}
 
 \section{Fitting}
+\subsection{Transfer Function}
+The data recorded by the experiment is stored as the complex values of something known as the transfer function. Before this can be plotted, we need to extract the $Z_{TES}$ from the transfer function. The transfer function, which is a function of frequency, is defined as:
+\begin{eqnarray}
+	T(f) \equiv -\frac{V_{feedback}}{V_{bias}}
+\end{eqnarray}
+For every run, we take three sets of data sets of transfer functions: one at the superconducting state, one at the normal state and one at the transition we are interested in. We are going to lavel this $T_{SC}$, $T_{N}$ and $T$ respectively.
+The feedback voltage (WHY?!) is also:
+\begin{eqnarray}
+	V_{feedback} &=& C I
+\end{eqnarray}
+If we combine this with the definition of the transfer function we obtain:
+\begin{eqnarray}
+	I &=& - \frac{V_{bias}}{C} T
+\end{eqnarray}
+
+Once again, we convert this circuit to a Thevin equivalent circuit, with voltage $V_{TES}$, an equivalent impedance $Z_{EQ}$ and the TES complex impdeance $Z_{TES}$. By Ohm's Law:
+\begin{eqnarray}
+	I &=& \frac{V_{th}}{Z_{eq} + Z_{TES}} \\
+	I^{-1} &=& \frac{Z_{eq}}{V_{th}} + \frac{Z_{TES}}{V_{th}} 
+\end{eqnarray}
+
+In the superconducting region $Z_{TES} = 0$, therefore the current when superconducting ($I_{sc}$) is equal to:
+\begin{eqnarray}
+	I^{-1} &=& \frac{Z_{eq}}{V_{th}} \\
+	\frac{Z_{eq}}{V_{th}} &=& - \frac{C}{V_{bias} T_{SC}} \label{zeq-sc}
+\end{eqnarray}
+
+In the normal region $Z_{TES} = R_N$, therefore the current when normal ($I_N$) is:
+\begin{eqnarray}
+	I^{-1} &=& \frac{Z_{eq}}{V_{th}} + \frac{R_N}{V_{th}} \\
+	- \frac{C}{V_{bias} T_N} &=& - \frac{C}{V_{bias} T_{SC}} + \frac{R_N}{V_{th}} \\
+	\frac{C}{V_{bias}} \left( \frac{1}{T_{SC}} - \frac{1}{T_N} \right) &=& \frac{R_N}{V_{th}} \label{zeq-n2}\\
+	\frac{1}{V_{th}} &=& \frac{C}{R_N V_{bias}} \left( \frac{1}{T_{SC}} - \frac{1}{T_N} \right) \label{zeq-n}
+\end{eqnarray}
+
+Dividing \eqref{zeq-sc} by \eqref{zeq-n} leads us to:
+\begin{eqnarray}
+	Z_{eq} &=& - \frac{R_N}{T_{SC}} \left( \frac{1}{T_{SC}} - \frac{1}{T_N} \right)^{-1}
+\end{eqnarray}
+
+For the transition region, we go back to the definition of the transfer function:
+\begin{eqnarray}
+	T \equiv -\frac{V_{feedback}}{V_{bias}} &=& -\frac{C}{V_{bias}} I \\
+	 &=& -\frac{\frac{C}{V_{bias}} V_{th}}{Z_{eq} + Z_{TES}} \\
+	Z_{TES} &=& \frac{-1}{T} \frac{C V_{th}}{V_{bias}} - Z_{eq} \label{ztes-t}
+\end{eqnarray}
+
+Substituting the expression for $\frac{C V_{th}}{V_{bias}}$ from \eqref{zeq-n2} and $Z_{TES}$ from \eqref{ztes-t}:
+\begin{eqnarray}
+	Z_{TES} &=& \frac{-R_N}{T}\left( \frac{1}{T_{SC}} - \frac{1}{T_N} \right)^{-1} + \frac{R_N}{T_{SC}} \left( \frac{1}{T_{SC}} - \frac{1}{T_N} \right)^{-1} \\
+		&=& R_N \left( \frac{1}{T_{SC}} - \frac{1}{T_N} \right)^{-1} \left( \frac{1}{T_{SC}} - \frac{1}{T} \right)
+\end{eqnarray}
+
+\subsection{Optimization}
+Earlier we derived the $Z_{TES}$ as predicated by the model in \eqref{ztes}, where there are four paramaters ($R_0$, $\beta$, $\mathcal{L}$ and $\tau$). The fitting program uses an optimization algorithm to find these parameters.
+
+First of all we define an error metric that is summed across all the data point frquencies:
+\begin{eqnarray}
+	E &=& \sum |Z_{prediction}(\omega_i) - Z_{measured}(\omega_i)|^2
+\end{eqnarray}
+
+The optimization algorthims simply find the coeffecients that best minimise this quantity. If there are $N$ coeffecients, then it is best imagined as an $N+1$ dimensional surface. Having given the algorithm some appropriately chosen initial guesses, it tries modifying them one-by-one and seeing if the error goes up or goes down. This is as if it is mapping out the gradients around that point. Once it has done this in all directions and got a sufficiently good estimate for the local gradient, it then moves in the direction of steepest descent and then starts the process again.
+
+One must be careful, though, that the final coeffecients are really the global minimum and not a local minimum. For example, the algorithm can often get stuck and produce something that is obviously not valid as shown in figure INSERT A GRAPH DEMONSTRATING. WHAT TO DO !!!!
+
+The one actually used in the progam is a a modifed variant of the Powell method. Although the way it chooses the directions to try out and search along is somewhat sophisticated and beyond the scope of this paper, the basic principle is still the same as outlined above.
+
+\subsection{One block model}
+
+
+\section{Expanding}
+\subsection{Two block model}
+
+\section{Multiple sensors}
+\subsection{Extra fitting constraints}
+\subsection{Results}
+\subsection{Error}
+
+
+
 
 
 \end{document}
