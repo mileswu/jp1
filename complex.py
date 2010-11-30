@@ -3,9 +3,11 @@
 import numpy
 import matplotlib.pyplot as plot
 import scipy.optimize
+import os
+import re
 
 def read_file(f):
-	file = open(f, 'r')
+	file = open(f + '/complex.dat', 'r')
 
 	length = -1
 	file.readline()
@@ -14,10 +16,8 @@ def read_file(f):
 		if line == '':
 			break
 		split_line = line.split()
-		if(float(split_line[0]) < 5000):
+		if(float(split_line[0]) < 9000):
 			length += 1
-
-	#length = 650
 
 	freq = numpy.zeros(length)
 	com = numpy.zeros(length, complex)
@@ -42,6 +42,35 @@ def transfer_func(s, n, m):
 		f = 1.0/(1.0/s[1][x] - 1.0/n[1][x])
 		out[x] = r_n * f* (1.0/s[1][x] - 1.0/m[1][x])
 	return out
+
+def plot_complexn(freq, data):
+	titles = ["10% Rn","50% Rn","90% Rn"]
+
+	plot.subplots_adjust(wspace=0.4, hspace=0.5)
+	a = plot.subplot(121)
+	#plot.title("Z_TES")
+	for i in data:
+		a.semilogx(freq, numpy.real(i), ',')
+	plot.xlabel("Frequency /Hz")
+	plot.ylabel("Re(Z) /mOhms")
+	plot.xlim(xmin=1)
+
+	a = plot.subplot(122)
+	for i in data:
+		a.semilogx(freq, numpy.imag(i), ',')
+	plot.xlabel("Frequency /Hz")
+	plot.ylabel("Im(Z) /mOhms")
+	plot.xlim(xmin=1)
+	plot.show()
+	
+	for i in data:
+		plot.plot(numpy.real(i), numpy.imag(i), ',')
+	plot.axes().set_aspect('equal')
+	plot.xlabel("Re(Z) /mOhms")
+	plot.ylabel("Im(Z) /mOhms")
+	
+	plot.legend(titles, numpoints=100, loc=2, ncol=3, bbox_to_anchor=(-0.0, -0.2))
+	plot.show()
 
 def plot_complex(freq, data):
 	a = plot.subplot(311)
@@ -80,20 +109,20 @@ def predict_func_matrix(coeff, spacing):
 	predict = numpy.zeros(len(spacing), complex)
 	loop = 0
 	for w in spacing:
-		#matrix = numpy.array([
-		#	[(r_l + r_0*(1 + b_i))/l + i*w, l_i*g/i_0/l],
-		#	[-i_0*r_0*(2+b_i)/c, 1/t_i + i*w]
-		#])
+		matrix = numpy.array([
+			[(r_l + r_0*(1 + b_i))/l + i*w, l_i*g/i_0/l],
+			[-i_0*r_0*(2+b_i)/c, 1/t_i + i*w]
+		])
 		#matrix = numpy.array([
 		#	[(r_l + r_0*(1 + b_i))/l + i*w, l_i*g/i_0/l, 0],
 		#	[-i_0*r_0*(2+b_i)/c, 1/t_i + i*w, g1/c1],
 		#	[0, -g1/c1, i*w]
 		#])
-		matrix = numpy.array([
-			[(r_l + r_0*(1 + b_i))/l + i*w, l_i*g/i_0/l, 0],
-			[-i_0*r_0*(2+b_i)/c, g/c -g*l_i/c + i*w, -g/c],
-			[0, -g/c1, g/c1 + g1/c1 + i*w]
-		])
+		#matrix = numpy.array([
+		#	[(r_l + r_0*(1 + b_i))/l + i*w, l_i*g/i_0/l, 0],
+		#	[-i_0*r_0*(2+b_i)/c, g/c -g*l_i/c + i*w, -g/c],
+		#	[0, -g/c1, g/c1 + g1/c1 + i*w]
+		#])
 		inv = numpy.linalg.inv(matrix)
 		predict[loop] = l/inv[0][0] - r_l - i*w*l
 
@@ -120,8 +149,6 @@ def error_func(coeff, spacing, source):
 def fit_nist(s, out):
 	args = (s[0], out)
 	coeff = scipy.optimize.fmin_powell(error_func, numpy.array([10.0, 1.0, 15.0, 1000.0, 41.0, 1.0, 1.0]), args)
-	#coeff = numpy.array([391.0, 0.9, 0.004, 878.0, 285.0])
-	#coeff = numpy.array([10.0, 0.9, 15.0, 3857.0, 45.0])
 	print "Coeffecients: ", coeff
 	print "Error: ", error_func(coeff, s[0], out)
 	predict = predict_func_matrix(coeff, s[0])
@@ -129,26 +156,55 @@ def fit_nist(s, out):
 	a = plot.subplot(311)
 	a.plot(numpy.log10(s[0]), numpy.real(out), 'o')
 	a.plot(numpy.log10(s[0]), numpy.real(predict), 'o')
-	a = plot.subplot(312)
+	a = plot.subplot(323)
 	a.plot(numpy.log10(s[0]), numpy.imag(out), 'o')
 	a.plot(numpy.log10(s[0]), numpy.imag(predict), 'o')
-	a = plot.subplot(313)
+	a = plot.subplot(133)
 	a.plot(numpy.real(out), numpy.imag(out), 'o')
 	a.plot(numpy.real(predict), numpy.imag(predict), 'o')
 	plot.show()
 
 
 
-base_dir = 'ABS_Pod23_241010/rs.04/'
+base_dir = 'ABS_Pod15_081110/rs.01/'
 
-s = read_file(base_dir + 'const_complex_na_0_0.38_0.250/complex.dat')
-n = read_file(base_dir + 'const_complex_na_0_0.60_0.250/complex.dat')
-m = read_file(base_dir + 'const_complex_na_2_0.38_0.240/complex.dat')
+files = []
+temps = []
+for i in os.listdir(base_dir):
+	match = re.match("const_complex_na_(.*?)_(.*?)_", i)
+	if match:
+		files.append(i)
+		temps.append(match.group(2))
 
-out = transfer_func(s, n, m)
+temps = list(set(temps)) #uniq
+temps.sort()
+files.sort()
 
-#plot_complex(s[0], out)
-fit_nist(s, out)
+#have temp choosing function
+temp = temps[0]
+
+n_f = [x for x in files if re.match("const_complex_na_0_" + temps[-1], x)][0]
+s_f = [x for x in files if re.match("const_complex_na_0_" + temp, x)][0]
+m_f = [x for x in files if re.match("const_complex_na_[^0]_" + temp, x)]
+print m_f
+
+if len(files) == 0:
+	print "No data found"
+	sys.exit()
+
+
+
+
+s = read_file(base_dir + s_f)
+n = read_file(base_dir + n_f)
+m = []
+for i in m_f:
+	temp = read_file(base_dir + i)
+	out = transfer_func(s, n, temp)
+	m.append(out)
+
+plot_complexn(s[0], m)
+#fit_nist(s, out)
 
 #Coeffecients:  [  5.98340389e+00   6.23565491e-01   1.61887268e-01   1.52429108e+04
   # 5.61840916e+00   1.75209612e+01   2.07340763e+01]
